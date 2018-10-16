@@ -197,8 +197,19 @@ def scan_for_requests(since_tweet_id):
 
 # In[ ]:
 
-since_tweet_id = long(os.getenv("since_tweet_id"))
 
+DATABASE_URL = os.environ['DATABASE_URL']
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+cur = conn.cursor()
+cur.execute("""SELECT since_tweet_id from settings """)
+rows = cur.fetchall()
+since_tweet_id=long(rows[0])
+# since_tweet_id = long(os.getenv("since_tweet_id"))
 while True:
     time.sleep(30)
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    cur = conn.cursor()
     since_tweet_id = scan_for_requests(since_tweet_id)
+    cursor.execute("UPDATE settings SET since_tweet_id=(%s)", (str(since_tweet_id)));
+    conn.commit()
+    cursor.close()
