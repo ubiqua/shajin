@@ -63,10 +63,12 @@ def parse_requests(tweet, tweet_dict=dict()):
 def  basic_emotion_processor(sentiment_result):
     if sentiment_result['neg'] > 0.5:
         return '.Because, I am sad'
-    if sentiment_result['pos'] > 0.5:
+    elif sentiment_result['pos'] > 0.5:
         return '.Because, I am sad'
-    if sentiment_result['neu'] > 0.5:
+    elif sentiment_result['neu'] > 0.5:
         return '.Because, I dont care'
+    else:
+        return ''
 
 
     # In[ ]:
