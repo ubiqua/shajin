@@ -53,7 +53,7 @@ def parse_requests(tweet, tweet_dict=dict()):
     tweet_requests = []
     print(tweet_id)
     for mentions in tweet["entities"]["user_mentions"]:
-        if (mentions["screen_name"] != "shajin"):
+        if (mentions["screen_name"] != "dsapandora"):
             tweet_requests.append(mentions["screen_name"])
 
     tweet_dict = {"id":tweet_id,"user":tweet_user,"analysis_requests":tweet_requests}
