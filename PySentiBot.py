@@ -84,7 +84,6 @@ def analyze_sentiments(recent_tweets, sentiment_results=list()):
         sentiment_result = analyzer.polarity_scores(new_tweet["text"])
         msg = new_tweet["text"].encode('utf8', 'replace') + basic_emotion_processor(sentiment_result)
         bot_response = kernel.respond(msg)
-        kernel.saveBrain("bot_brain.brn")
         sentiment_result.update({"tweet_id": new_tweet["id"]})
         sentiment_result.update({"bot_response": bot_response })
         sentiment_results.append(sentiment_result)
