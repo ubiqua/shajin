@@ -150,7 +150,7 @@ def scan_for_requests(since_tweet_id):
 
     search_handle = "@dsapandora"
 
-    results = api.retweets_of_me(since_tweet_id)
+    results = api.mentions_timeline(since_tweet_id)
 
     print "Total results retrieved - "+ str(len(results))
 
