@@ -78,7 +78,7 @@ def analyze_sentiments(recent_tweets, sentiment_results=list()):
     for tweet in recent_tweets:
         new_tweet = cleanse_tweet(tweet)
         sentiment_result = analyzer.polarity_scores(new_tweet["text"])
-        msg = new_tweet["text"] + basic_emotion_processor(sentiment_result)
+        msg = new_tweet["text"].decode('utf-8').strip() + basic_emotion_processor(sentiment_result)
         bot_response = kernel.respond(msg)
         kernel.saveBrain("bot_brain.brn")
         sentiment_result.update({"tweet_id": new_tweet["id"]})
