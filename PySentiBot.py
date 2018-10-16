@@ -15,8 +15,6 @@ import aiml
 import os
 
 
-import os
-
 import time
 
 plt.style.use('fivethirtyeight')
@@ -34,11 +32,8 @@ access_token_secret = os.getenv("bot_access_token_secret")
 
 #Talking bot_brain
 kernel = aiml.Kernel()
-if os.path.isfile("bot_brain.brn"):
-    kernel.bootstrap(brainFile = "bot_brain.brn")
-else:
-    kernel.bootstrap(learnFiles = os.path.abspath("aiml/std-startup.xml"), commands = "load aiml b")
-    kernel.saveBrain("bot_brain.brn")
+kernel.bootstrap(learnFiles = os.path.abspath("aiml/std-startup.xml"), commands = "load aiml b")
+kernel.saveBrain("bot_brain.brn")
 
 
 # Setup Tweepy API Authentication
@@ -63,8 +58,19 @@ def parse_requests(tweet, tweet_dict=dict()):
     tweet_dict = {"id":tweet_id,"user":tweet_user,"analysis_requests":tweet_requests}
     return tweet_dict
 
-
 # In[ ]:
+
+def  basic_emotion_processor(sentiment_result):
+    if sentiment_result['neg'] > 0.5:
+        return '.Because, I am sad'
+    if sentiment_result['pos'] > 0.5:
+        return '.Because, I am sad'
+    if sentiment_result['neu'] > 0.5:
+        return '.Because, I dont care'
+
+
+    # In[ ]:
+
 
 
 def analyze_sentiments(recent_tweets, sentiment_results=list()):
@@ -72,9 +78,13 @@ def analyze_sentiments(recent_tweets, sentiment_results=list()):
     for tweet in recent_tweets:
         new_tweet = cleanse_tweet(tweet)
         sentiment_result = analyzer.polarity_scores(new_tweet["text"])
-        sentiment_result.update({"tweet_id":new_tweet["id"]})
+        msg = new_tweet["text"] + basic_emotion_processor(sentiment_result)
+        bot_response = kernel.respond(msg)
+        kernel.saveBrain("bot_brain.brn")
+        sentiment_result.update({"tweet_id": new_tweet["id"]})
+        sentiment_result.update({"bot_response": bot_response })
         sentiment_results.append(sentiment_result)
-    return [sentiment_results, new_tweet['text']]
+    return sentiment_results
 
 
 # In[ ]:
@@ -167,13 +177,9 @@ def scan_for_requests(since_tweet_id):
                 print analyze_request + " - " + str(len(recent_tweets))
 
                 if(len(recent_tweets) > 0):
-                    sentiments, message = analyze_sentiments(recent_tweets)
-                    bot_response = kernel.respond(message)
-                    kernel.saveBrain("bot_brain.brn")
-                    print(sentiments)
-                    print(bot_response)
-                    sentiment_fig = plot_sentiments(analyze_request,sentiments)
-                    text_status = datetime.now().strftime("%Y-%m-%d %H:%M:%S").decode('utf-8').strip() +" Shajin: " + item['user']+"! "+ bot_response.decode('utf-8').strip()[:75] +" btw... Here is the sentiment analysis of "+analyze_request+"!"
+                    sentiments = analyze_sentiments(recent_tweets)
+                    sentiment_fig = plot_sentiments(analyze_request, sentiments)
+                    text_status = "@" + item['user']+"! "+ sentiments[0]['bot_response'].strip()[:250]
                     api.update_with_media(filename=sentiment_fig,status=text_status,in_reply_to_status_id=item["id"])
                 else:
                     text_status = datetime.now().strftime("%Y-%m-%d %H:%M:%S").decode('utf-8').strip() +" - Thank you for your tweet "+ item['user']+"! Sorry, "+ analyze_request + " has no tweets!"
@@ -187,7 +193,6 @@ def scan_for_requests(since_tweet_id):
 
 
 # In[ ]:
-
 
 since_tweet_id = long(os.getenv("since_tweet_id"))
 
