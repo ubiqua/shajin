@@ -201,8 +201,8 @@ DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 cur = conn.cursor()
 cur.execute("""SELECT since_tweet_id from settings """)
-rows = cur.fetchall()
-since_tweet_id=long(rows[0])
+x = cur.fetchone()[0]
+since_tweet_id=long(x)
 # since_tweet_id = long(os.getenv("since_tweet_id"))
 while True:
     time.sleep(30)
