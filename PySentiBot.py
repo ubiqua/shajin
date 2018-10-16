@@ -85,7 +85,7 @@ def analyze_sentiments(recent_tweets, sentiment_results=list()):
         msg = new_tweet["text"].encode('utf8', 'replace') + basic_emotion_processor(sentiment_result)
         bot_response = kernel.respond(msg)
         sentiment_result.update({"tweet_id": new_tweet["id"]})
-        sentiment_result.update({"bot_response": bot_response })
+        sentiment_result.update({"bot_response": bot_response.encode('utf8', 'replace')[:250] })
         sentiment_results.append(sentiment_result)
     return sentiment_results
 
@@ -182,7 +182,7 @@ def scan_for_requests(since_tweet_id):
                 if(len(recent_tweets) > 0):
                     sentiments = analyze_sentiments(recent_tweets)
                     sentiment_fig = plot_sentiments(analyze_request, sentiments)
-                    text_status = "@" + item['user']+"! "+ sentiments[0]['bot_response'].strip()[:250]
+                    text_status = "@" + item['user']+" "+ sentiments[0]['bot_response']
                     api.update_with_media(filename=sentiment_fig,status=text_status,in_reply_to_status_id=item["id"])
                 else:
                     text_status = datetime.now().strftime("%Y-%m-%d %H:%M:%S").decode('utf-8').strip() +" - Thank you for your tweet "+ item['user']+"! Sorry, "+ analyze_request + " has no tweets!"
