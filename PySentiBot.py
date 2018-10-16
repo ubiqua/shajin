@@ -13,8 +13,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import aiml
 import os
-
-
+import psycopg2
 import time
 
 plt.style.use('fivethirtyeight')
